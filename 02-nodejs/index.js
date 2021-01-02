@@ -4,8 +4,8 @@
  * 2 Get user adress by Id
  */
 
- const util = require('util');
- const getAdressAsync = util.promisify(getAdress)
+const util = require('util');
+const getAdressAsync = util.promisify(getAdress)
 
 function getUser() {
   return new Promise(function resolvePromise(resolve, reject) {
@@ -20,7 +20,7 @@ function getUser() {
 }
 
 function getPhone(idUser) {
-  return new Promise(function resolvePromise(resolve, reject){
+  return new Promise(function resolvePromise(resolve, reject) {
     setTimeout(() => {
       return resolve({
         phone: '999999',
@@ -39,41 +39,70 @@ function getAdress(idUser, callback) {
   }, 2000);
 }
 
-const userPromise = getUser()
+async function main() {
+  try {
+    console.time('medida-promise')
+    const user = await getUser()
+    // const phone = await getPhone(user.id)
+    // const adress = await getAdressAsync(user.id)
+    
+    const result = await Promise.all([
+      getPhone(user.id),
+      getAdressAsync(user.id)
+    ])
 
-userPromise
-  .then(function (user) {
-    return getPhone(user.id)
-    .then(function resolvePhone(result){
-      return {
-        user: {
-          name: user.name,
-          id: user.id//
-        },
-        phone: result
-      }
-    })
-  })
-  .then(function(result) {
-    const adress = getAdressAsync(result.user.id)
-    return adress.then(function resolveAdress(resultAdress) {
-      return {
-        user: result.user,
-        phone: result.phone,
-        adress: resultAdress
-      }
-    });
-  })
-  .then(function (result) {
+    const phone = result[1]
+    const adress = result[0]
+
+    console.timeEnd('medida-promise')
+
     console.log(`
-      Name: ${result.user.name},
-      Adress: ${result.adress.street}, ${result.adress.number}, 
-      Phone: (${result.phone.ddd}) ${result.phone.phone}, 
-    `)
-  })
-  .catch(function (error) {
-    console.error('something went wrong', error)
-})
+            Name: ${user.name},
+            Adress: ${adress.street}, ${adress.number}
+            Phone: (${phone.ddd}) ${phone.phone}
+           `);
+
+  } catch (error) {
+    console.log('Deu ruim', error)
+  }
+}
+
+main()
+
+// const userPromise = getUser()
+// userPromise
+//   .then(function (user) {
+//     return getPhone(user.id)
+//     .then(function resolvePhone(result){
+//       return {
+//         user: {
+//           name: user.name,
+//           id: user.id//
+//         },
+//         phone: result
+//       }
+//     })
+//   })
+//   .then(function(result) {
+//     const adress = getAdressAsync(result.user.id)
+//     return adress.then(function resolveAdress(resultAdress) {
+//       return {
+//         user: result.user,
+//         phone: result.phone,
+//         adress: resultAdress
+//       }
+//     });
+//   })
+//   .then(function (result) {
+//     console.log(`
+//       Name: ${result.user.name},
+//       Adress: ${result.adress.street}, ${result.adress.number}, 
+//       Phone: (${result.phone.ddd}) ${result.phone.phone}, 
+//     `)
+//   })
+//   .catch(function (error) {
+//     console.error('something went wrong', error)
+// })
 
 // getUser(function resolveUser(error, user) {
 //   if (error) {
