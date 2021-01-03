@@ -37,7 +37,7 @@ class Database {
     ]
 
     const result = await this.writeHeroFileData(finalData)
-    return
+    return result
 
   }
 
