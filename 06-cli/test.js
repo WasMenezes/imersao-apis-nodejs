@@ -12,15 +12,25 @@ const DEFAULT_ITEM_REGISTER = {
 
 
 describe('Suite heroes manipulation', () => {
+  before(async () => {
+    await database.registerHeroes(DEFAULT_ITEM_REGISTER);
+  })
+
   it('Should search a hero using a file', async () => {
     const expected = DEFAULT_ITEM_REGISTER
     const [result] = await database.listHeroes(expected.id)
     //[result] >> Destructor
     deepStrictEqual(result, expected)
   })
-  // it ('Should create a hero using files', async () => {
-  //   const expected = DEFAULT_ITEM_REGISTER
 
-  //   ok(null, expected)
-  // })
+  it('Should create a hero using files', async () => {
+    const expected = { 
+      ...DEFAULT_ITEM_REGISTER,
+      id: 2,
+      name: 'Batman'
+    }
+    await database.registerHeroes(expected)
+    const [actual] = await database.listHeroes(expected.id)
+    deepStrictEqual(actual, expected)
+  })
 })
