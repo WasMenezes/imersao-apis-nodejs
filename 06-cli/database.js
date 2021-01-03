@@ -55,11 +55,31 @@ class Database {
     const data = await this.getHeroFileData()
     const index = data.findIndex(item => item.id === parseInt(id))
     if(index === -1) {
-      throw Error('User not found')
+      throw Error('Hero not found')
     }
 
     data.splice(index, 1)
     return await this.writeHeroFileData(data)
+  }
+
+  async update(id, modifiedHero) {
+    const data = await this.getHeroFileData()
+    const index = data.findIndex(item => item.id === parseInt(id))
+
+    if (index === -1) {
+      throw Error('Hero not found')
+    }
+    const actual = data[index]
+    const obectToUpdate = {
+      ...actual, 
+      ...modifiedHero
+    }
+    data.splice(index, 1)
+    
+    return await this.writeHeroFileData([
+      ...data,
+      obectToUpdate
+    ])
   }
 }
 
