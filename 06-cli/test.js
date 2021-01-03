@@ -33,4 +33,10 @@ describe('Suite heroes manipulation', () => {
     const [actual] = await database.listHeroes(expected.id)
     deepStrictEqual(actual, expected)
   })
+
+  it('Should delete a hero by id', async () => {
+    const expected = true
+    const result = await database.remove(DEFAULT_ITEM_REGISTER.id)
+    deepStrictEqual(result, expected)
+  })
 })
