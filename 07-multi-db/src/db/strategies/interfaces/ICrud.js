@@ -14,6 +14,10 @@ class ICrud {
   delete(id) {
     throw new NotImplementadException()
   }
+
+  isConnected() {
+    
+  }
 }
 
 module.exports = ICrud
