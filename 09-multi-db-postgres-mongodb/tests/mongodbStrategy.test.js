@@ -11,12 +11,22 @@ const MOCK_HERO_DEFAULT = {
   name: `Spider Man - ${Date.now()}`,
   power: 'Cobweb'
 }
+
+const MOCK_HERO_UPDATE = {
+  name: `Naruto - ${Date.now()}`,
+  power: 'Kyub'
+}
+
+let MOCK_HERO_ID = ''
+
 const context = new Context(new MongoDb())
 
 describe('MongoDB Suite Tests', function () {
   this.beforeAll(async () => {
     await context.connect()
     await context.create(MOCK_HERO_DEFAULT)
+    const result  = await context.create(MOCK_HERO_UPDATE)
+    MOCK_HERO_ID = result._id
   })
 
   it('verify conection', async () => {
@@ -31,11 +41,19 @@ describe('MongoDB Suite Tests', function () {
   })
 
   it('list', async () => {
-    const [{name, power}] = await context.read({name: MOCK_HERO_DEFAULT.name})
+    const [{ name, power }] = await context.read({ name: MOCK_HERO_DEFAULT.name })
 
     const result = {
       name, power
     }
     assert.deepStrictEqual(result, MOCK_HERO_DEFAULT)
+  })
+
+  it('update', async () => {
+    const result = await context.update(MOCK_HERO_ID, {
+      name: 'Fred'
+    })
+
+    assert.deepStrictEqual(result.nModified, 1)
   })
 })

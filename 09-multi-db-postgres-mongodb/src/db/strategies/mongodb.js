@@ -19,9 +19,9 @@ class MongoDb extends ICrud {
 
     if (state !== 'Connecting') return state;
 
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      return STATUS[this._driver.readyState]
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    return STATUS[this._driver.readyState]
   }
 
   defineModel() {
@@ -55,8 +55,12 @@ class MongoDb extends ICrud {
     return this._heroes.create(item)
   }
 
-  read(item, skip=0, limit = 10) {
+  read(item, skip = 0, limit = 10) {
     return this._heroes.find(item).skip(skip).limit(limit)
+  }
+
+  update(id, item) {
+    return this._heroes.updateOne({ _id: id }, { $set: item })
   }
 }
 
