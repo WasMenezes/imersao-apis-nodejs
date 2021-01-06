@@ -25,7 +25,7 @@ class MongoDb extends ICrud {
   }
 
   defineModel() {
-    this._heroes = Mongoose.Schema({
+    const heroSchema = Mongoose.Schema({
       name: {
         type: String,
         required: true
@@ -39,6 +39,8 @@ class MongoDb extends ICrud {
         default: new Date()
       }
     })
+
+    this._heroes = Mongoose.model('heroes', heroSchema)
   }
 
   connect() {
@@ -46,13 +48,15 @@ class MongoDb extends ICrud {
     const connection = Mongoose.connection
     this._driver = connection
     connection.once('open', () => console.log('database running!!'))
+    this.defineModel()
   }
 
-  async create(item) {
-    const resultRegister = await model.create({
-      name: 'Batman',
-      power: 'Money'
-    })
+  create(item) {
+    return this._heroes.create(item)
+  }
+
+  read(item, skip=0, limit = 10) {
+    return this._heroes.find(item).skip(skip).limit(limit)
   }
 }
 
