@@ -25,7 +25,7 @@ describe('MongoDB Suite Tests', function () {
   this.beforeAll(async () => {
     await context.connect()
     await context.create(MOCK_HERO_DEFAULT)
-    const result  = await context.create(MOCK_HERO_UPDATE)
+    const result = await context.create(MOCK_HERO_UPDATE)
     MOCK_HERO_ID = result._id
   })
 
@@ -55,5 +55,10 @@ describe('MongoDB Suite Tests', function () {
     })
 
     assert.deepStrictEqual(result.nModified, 1)
+  })
+
+  it('remove', async () => {
+    const result = await context.delete(MOCK_HERO_ID)
+    assert.deepStrictEqual(result.n, 1)
   })
 })
