@@ -4,12 +4,13 @@
   "description": "docker run \\\r     --name postgres \\\r     -e POSTGRES_USER=wasmenezes \\\r     -e POSTGRES_PASSWORD=mysecretkey \\\r     -e POSTGRES_DB=heroes \\\r     -p 5432:5432 \\\r     -d \\\r     postgres",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha -w tests/*.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "mongoose": "^5.11.10",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.3.5"
