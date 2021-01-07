@@ -17,4 +17,5 @@ describe.only('Suite tests from API Heroes', function () {
     assert.deepStrictEqual(statusCode, 200)
     assert.ok(Array.isArray(data))
   })
+
 })
