@@ -4,7 +4,8 @@
   "description": "docker run \\\r     --name postgres \\\r     -e POSTGRES_USER=wasmenezes \\\r     -e POSTGRES_PASSWORD=mysecretkey \\\r     -e POSTGRES_DB=heroes \\\r     -p 5432:5432 \\\r     -d \\\r     postgres",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -w tests/*.test.js"
+    "test": "mocha --timeout 10000 -w tests/*.test.js",
+    "test:prod": "cross-env NODE_ENV=prod npm t"
   },
   "keywords": [],
   "author": "",
