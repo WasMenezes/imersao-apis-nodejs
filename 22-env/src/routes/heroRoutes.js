@@ -1,0 +1,179 @@
+const BaseRoute = require('./base/baseRoute')
+const Joi = require('joi');
+const Boom = require('boom')
+const failAction = (request, headers, erro) => {
+  throw erro;
+}
+
+const headers = Joi.object({
+  authorization: Joi.string().required()
+}).unknown()
+
+class HeroRoutes extends BaseRoute {
+  constructor(db) {
+    super()
+    this.db = db
+  }
+
+  list() {
+    return {
+      path: '/heroes',
+      method: 'GET',
+      config: {
+        tags: ['api'],
+        description: 'Should list heroes',
+        notes: 'Paginate results and filter by name',
+        validate: {
+          // payload -> body
+          // headers -> header
+          // params -> na URL :id
+          // query -> ?ski=10limit100
+          //failAction: (request, headers,)
+          headers,
+          query: {
+            skip: Joi.number().integer().default(0),
+            limit: Joi.number().integer().default(10),
+            name: Joi.string().min(3).max(100),
+          },
+        }
+      },
+      handler: (request, headers) => {
+        try {
+          const { skip, limit, name } = request.query
+
+          const query = name ? {
+            name: {
+              $regex: `.*${name}*.`
+            }
+          } : {}
+
+          // if (isNaN(skip) && skip)
+          //   throw Error('Skip type is incorrect')
+
+          // if (isNaN(limit) && limit)
+          //   throw Error('limit type is incorrect')
+
+          return this.db.read(name ? query : {}, skip, limit)
+
+        } catch (error) {
+          console.log('Something went wrong', error)
+          return Boom.internal()
+        }
+      }
+    }
+  }
+
+  create() {
+    return {
+      path: '/heroes',
+      method: 'POST',
+      config: {
+        tags: ['api'],
+        description: 'Should register heroes',
+        notes: 'Should register hero by name and power',
+        validate: {
+          failAction,
+          headers,
+          payload: {
+            name: Joi.string().required().min(3).max(100),
+            power: Joi.string().required().min(2).max(100)
+          }
+        }
+      },
+      handler: async (request) => {
+        try {
+          const { name, power } = request.payload
+          const result = await this.db.create({ name, power })
+          return {
+            message: `Hero sucessfuly registered`,
+            _id: result._id
+          }
+        } catch (error) {
+          console.log('Something went wrong', error)
+          return Boom.internal()
+        }
+      }
+    }
+  }
+
+  update() {
+    return {
+      path: '/heroes/{id}',
+      method: 'PATCH',
+      config: {
+        tags: ['api'],
+        description: 'Should update heroes',
+        notes: 'Should update hero by name and power',
+        validate: {
+          params: {
+            id: Joi.string().min(3).max(100),
+          },
+          headers,
+          payload: {
+            name: Joi.string().min(3).max(100),
+            power: Joi.string().min(2).max(100)
+          }
+        }
+      },
+      handler: async (request) => {
+        try {
+          const {
+            id
+          } = request.params;
+
+          const { payload } = request
+          const dataString = JSON.stringify(payload)
+          const data = JSON.parse(dataString)
+
+          const result = await this.db.update(id, data)
+          if (!result) return Boom.preconditionFailed('id not found') 
+
+          return {
+            message: 'Hero sucessfuly updated'
+          }
+
+        } catch (error) {
+          console.error('Something went wrong', error)
+          return Boom.internal()
+        }
+      }
+    }
+  }
+
+  delete() {
+    return {
+      path: '/heroes/{id}',
+      method: 'DELETE',
+      config: {
+        tags: ['api'],
+        description: 'Should register heroes',
+        notes: 'Should register hero by name and power',
+        validate: {
+          failAction,
+          params: {
+            id: Joi.string().required()
+          },
+          headers,
+        }
+      },
+      handler: async(request) => {
+        try {
+          const { id } = request.params
+          const result = await this.db.delete(id)
+
+          if (result.n !== 1) return Boom.preconditionFailed('Was not possible remove the hero')
+
+          return {
+            message: 'Hero sucessfuly removed'
+          }
+
+        } catch (error) {
+          console.log('something went wrong', error)
+          return Boom.internal()
+        }
+      }
+    }
+  }
+}
+
+module.exports = HeroRoutes;
